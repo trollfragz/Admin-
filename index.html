@@ -143,13 +143,13 @@ async function loadAll(){
 }
 
 /* ===== discord ===== */
-const webhookOn = () => /^https:\/\/(canary\.|ptb\.)?discord(app)?\.com\/api\/webhooks\//.test(DISCORD_WEBHOOK);
+const isHook = u => /^https:\/\/(canary\.|ptb\.)?discord(app)?\.com\/api\/webhooks\//.test(u);
 async function sendDiscord(embed){
-  if (!webhookOn()) return 'off';
-  try{
-    const r = await fetch(DISCORD_WEBHOOK, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:'HiveTiers', embeds:[embed], allowed_mentions:{parse:[]}})});
-    return r.ok ? 'ok' : 'fail';
-  }catch(e){ return 'fail'; }
+  const hooks = DISCORD_WEBHOOKS.filter(isHook);
+  if (!hooks.length) return 'off';
+  const body = JSON.stringify({username:'HiveTiers', embeds:[embed], allowed_mentions:{parse:[]}});
+  const results = await Promise.all(hooks.map(u => fetch(u, {method:'POST', headers:{'Content-Type':'application/json'}, body}).then(r => r.ok).catch(() => false)));
+  return results.every(Boolean) ? 'ok' : results.some(Boolean) ? 'partial' : 'fail';
 }
 function resultEmbed(c, winner, games, ranks){
   const wName = winner===c.fromUid ? c.fromName : c.toName;
