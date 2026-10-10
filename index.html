@@ -72,7 +72,10 @@ import { getFirestore, collection, doc, getDoc, getDocs, setDoc, updateDoc, writ
 /* ===== SETTINGS: paste your Discord webhook link between the quotes ===== */
 // Match results are posted here. Leave as-is to turn Discord messages off.
 // Tip: keep this admin file on your own device instead of GitHub, so the link stays private.
-const DISCORD_WEBHOOK = 'PASTE_YOUR_NEW_WEBHOOK_URL_HERE';
+const DISCORD_WEBHOOKS = [
+  'PASTE_SERVER_1_WEBHOOK_HERE',
+  'PASTE_SERVER_2_WEBHOOK_HERE'
+];
 
 /* ===== OPTIONAL: one shared tester account =====
    Put the username of ONE account (created on the main site and added to the roles collection) between the quotes.
