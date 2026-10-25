@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Tier Test Admin</title>
+<style>
+:root{--bg:#121420;--s1:#1a1d2b;--s2:#232738;--line:#2e3348;--tx:#eceef7;--mu:#8e94ab;--ac:#ffbf2f;--ac-ink:#1b1400;--ok:#4cd68a;--bad:#ff6b6b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:500 15px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:12px clamp(14px,3vw,28px);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{font-weight:800;font-size:18px;margin-right:auto;cursor:pointer}
+.brand i{display:inline-grid;place-items:center;width:26px;height:30px;margin-right:8px;background:var(--ac);color:var(--ac-ink);font-style:normal;font-size:14px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);vertical-align:middle}
+main{max-width:1000px;margin:0 auto;padding:20px clamp(14px,3vw,28px) 110px}
+h1{font-size:24px;margin:0}
+h2{font-size:17px;margin:0 0 10px}
+.ph{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.muted{color:var(--mu)}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 18px;border-radius:11px;border:1px solid var(--line);background:var(--s2);color:var(--tx);font:inherit;font-weight:700;cursor:pointer}
+.btn:hover{border-color:var(--ac)}
+.btn.primary{background:var(--ac);border-color:var(--ac);color:var(--ac-ink)}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:8px 14px;font-size:14px}
+.btn[disabled]{opacity:.6;pointer-events:none}
+.field,select,textarea{background:var(--s2);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:11px 12px;font:inherit;outline:0;max-width:100%}
+.field,textarea{width:100%}
+textarea{min-height:84px;resize:vertical}
+.field:focus,select:focus,textarea:focus{border-color:var(--ac)}
+label.l{display:block;font-weight:700;font-size:14px;margin:0 0 6px}
+.hint{font-size:12.5px;color:var(--mu);margin-top:4px}
+.err{color:var(--bad);font-weight:600;min-height:20px}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:8px}
+.tile{display:grid;gap:6px;text-align:left;padding:22px;background:var(--s1);border:1px solid var(--line);border-radius:16px;color:var(--tx);font:inherit;cursor:pointer}
+.tile:hover{border-color:var(--ac)}
+.tile b{font-size:19px}
+.tile span{color:var(--mu)}
+.gate{max-width:380px;margin:8vh auto 0;display:grid;gap:12px}
+.hex{display:inline-grid;place-items:center;flex:none;width:var(--w,40px);aspect-ratio:1/1.1547;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);font:700 calc(var(--w,40px)*.3)/1 system-ui;background:var(--c);color:#17131f}
+.hex.gHT{--c:#ffc933}.hex.gMT{--c:#6fb4ff}.hex.gLT{--c:#e0956a}.hex.none{background:var(--s2);color:var(--mu);font-weight:500}
+.av{width:var(--s);height:var(--s);border-radius:26%;position:relative;overflow:hidden;background:linear-gradient(135deg,var(--ac),#8a5cff);display:grid;place-items:center;flex:none}
+.av img{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.prow{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--s1);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer;width:100%;text-align:left;color:var(--tx);font:inherit}
+.prow:hover{border-color:var(--ac)}
+.prow .nm{flex:1;min-width:0}
+.prow .nm b{display:block}
+.ed{display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:start}
+.skin{display:grid;gap:10px;justify-items:center;text-align:center}
+.skin canvas{background:var(--s2);border-radius:12px;max-width:100%}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fields{display:grid;gap:14px}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.tg .mp{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--s2);border-radius:10px;padding:8px 10px}
+.tg .mp select{width:100px}
+dialog{background:var(--s1);color:var(--tx);border:1px solid var(--line);border-radius:16px;padding:20px;width:min(420px,92vw)}
+dialog::backdrop{background:#000b}
+#toasts{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);display:grid;gap:8px;z-index:60;width:min(420px,92vw)}
+.toast{background:var(--tx);color:var(--bg);padding:11px 16px;border-radius:12px;font-weight:700;box-shadow:0 12px 30px #0006}
+@media (max-width:860px){.ed{grid-template-columns:1fr}.f2{grid-template-columns:1fr}}
+#gen{position:fixed;left:10px;right:10px;bottom:10px;z-index:50;background:#22262c;color:#e8eaed;border:1px solid #3a3f47;border-radius:8px;padding:10px;font-size:13px}#gen[hidden]{display:none}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="top">
+  <span class="brand" id="brand"><i>T</i>Tier Test Admin</span>
+  <button class="btn sm" id="out" hidden>Log out</button>
+</header>
+<main id="app"></main>
+<dialog id="dlg"></dialog>
+<div id="toasts" aria-live="polite"></div>
+<div id="gen" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/skinview3d@3.1.0/bundles/skinview3d.bundle.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+/* ============================ SETTINGS ============================ */
+// Login. The admin account is the "Tester" account that is listed in the roles collection.
+// KEY LEFT EMPTY (recommended): the page asks for the tester key (the account password) once on each device
+// and then stays signed in. Anyone who reads this file learns nothing.
+// If you paste the password into TESTER_KEY instead, nobody is asked anything, BUT everyone who can read
+// this file can log in and change your whole website. Only do that if this file is kept private.
+const TESTER_USERNAME = 'Tester';
+const TESTER_KEY = '';
+
+// Optional: Discord webhooks that get a message whenever you change a player's tiers (one link per server).
+// Leave the PASTE_ text as it is to turn this off.
+const DISCORD_WEBHOOKS = [
+  'PASTE_SERVER_1_WEBHOOK_HERE',
+  'PASTE_SERVER_2_WEBHOOK_HERE'
+];
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDk8MafiRLCGoOz84k6Y11wHmEbd_4jiVk",
+  authDomain: "hive-tier.firebaseapp.com",
+  projectId: "hive-tier",
+  storageBucket: "hive-tier.firebasestorage.app",
+  messagingSenderId: "268227785809",
+  appId: "1:268227785809:web:7628cec5f6a1f71c2ab470"
+};
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+
+/* ============================ SHARED DATA ============================ */
+const MODES = [
+  {id:'boxing', name:'Boxing', icon:'🥊'}, {id:'skywars', name:'Skywars', icon:'☁️'}, {id:'bedfight', name:'Bedfight', icon:'🛏️'},
+  {id:'mlgrush', name:'MLGRush', icon:'🧱'}, {id:'finaluhc', name:'Final UHC', icon:'❤️'}, {id:'topfight', name:'Top Fight', icon:'🔥'},
+  {id:'nodebuff', name:'NoDebuff', icon:'🧪'}, {id:'battlerush', name:'Battlerush', icon:'⚡'}
+];
+const REGIONS = ['NA','EU','AS','SA','OC','AF'];
+// order on the board: HT1, MT1, LT1, HT2, MT2, LT2 ... LT5
+const TIERS = [1,2,3,4,5].flatMap(n => ['HT','MT','LT'].map(g => g+n));
+const PTS = {HT1:60,MT1:52,LT1:44,HT2:36,MT2:30,LT2:24,HT3:20,MT3:16,LT3:12,HT4:9,MT4:7,LT4:5,HT5:3,MT5:2,LT5:1};
+const tierIdx = v => {
+  if (v==null || v==='') return null;
+  if (typeof v==='string'){ const i = TIERS.indexOf(v.trim().toUpperCase()); return i<0 ? null : i; }
+  if (typeof v==='number') return (v>=0 && v<=9) ? TIERS.indexOf((v%2 ? 'LT' : 'HT') + (Math.floor(v/2)+1)) : null;
+  return null;
+};
+const pts = i => i==null ? 0 : PTS[TIERS[i]];
+const STEVE_SKIN = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABkklEQVR4nO2avUoDQRSF78hW1jZCin0DxR8wKoiNhQTLFKliL6QIBAIphTRaSF7AahFLEQtLIbFQFsEH0EKw2XfQLqjBuRtm16Pe81UhM7t7cnLmh53rRGF3KX7ztTe317zX14/PnPYMJDNoAWhoAFoAGhqAFoCGBqAFoHHaOl82V+kzdJ9gPgFRr1HzdjhMLuW7Pr62j31+M+YToBrQa9Sk2h5IJ4nH33WSWKrtgfrv/wXc6Ogg9yT48pqJiEhlfi73A7QhgJ4Eo7wdL67vxp/TxyfZ21ktRdBPk9uA//KDvzIRv8WVvndIPNx3/ZHtn4TtK7qtqe5/nt1+ap72/QNXAbQANOYNcBtbp0Fjdrg/W5SWcmjWvXOC+QTQALQANLk3QihG2U3Q9etKu/kE0AC0ADQ0AC0ATbS8kAbdYCibBUnBYD4BhBBCCCGEEEIIsUfh5SlF1xeEnv9rmH8jRAPQAtAEjyd4fYFy/q9hPgE0AC0ADbw+oOzzfw3zCaABaAFoaABaAJrgVSC0vgCN+QS8A7s6UKgJlSM8AAAAAElFTkSuQmCC';
+const STEVE_HEAD = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAdElEQVR4nGP0MlL4z4AHMOGTZGBgYGBhYGBgqInywSrZsmwLYRMYjvXk/P////9/G6Oe/8d6cv4f68n5b2PU8///////j/Xk/Gc81pMDd+ST528YGBgYGGQkRVDdwMDAwLBp12m44LnL9xn83ExRFcAE0AEALtQnknbTjlMAAAAASUVORK5CYII=';
+
+/* ============================ HELPERS ============================ */
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const esc2 = s => String(s).replace(/([*_`~|>\\])/g, '\\$1');
+const clone = o => JSON.parse(JSON.stringify(o));
+const newId = () => (crypto.randomUUID ? crypto.randomUUID().replace(/-/g, '') : String(Date.now()) + Math.random().toString(16).slice(2)).slice(0, 20);
+function toast(m){ if (!m) return; const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; $('#toasts').appendChild(t); setTimeout(() => t.remove(), 4200); }
+function errMsg(e){
+  const c = (e && e.code) || '';
+  if (c === 'auth/invalid-credential' || c === 'auth/wrong-password' || c === 'auth/user-not-found') return 'Wrong tester key.';
+  if (c === 'auth/too-many-requests') return 'Too many tries. Wait a minute.';
+  if (c === 'permission-denied') return 'Firestore refused this. Publish the latest firestore2.rules, and check that this account is in the roles collection.';
+  return (e && e.message) || 'Something went wrong.';
+}
+async function guard(fn){ try{ return await fn(); }catch(e){ console.error(e); toast(errMsg(e)); } }
+function badge(i, w){
+  w = w || 40;
+  if (i==null) return `<span class="hex none" style="--w:${w}px">–</span>`;
+  return `<span class="hex g${TIERS[i].slice(0,2)}" style="--w:${w}px">${TIERS[i]}</span>`;
+}
+const avatar = (head, s) => `<span class="av" style="--s:${s||40}px"><img alt="" src="${/^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(head||'') ? head : STEVE_HEAD}"></span>`;
+const openDlg = html => { const d = $('#dlg'); d.innerHTML = html; if (!d.open) d.showModal(); };
+const closeDlg = () => { const d = $('#dlg'); if (d.open) d.close(); };
+$('#dlg').addEventListener('click', e => { if (e.target.id === 'dlg') closeDlg(); });
+
+/* ============================ STATE ============================ */
+let authReady = false, user = null, isTester = false, autoTried = false, loginErr = '';
+let USERS = [], PL = {}, PRIV = {};
+let screen = 'home', editId = null, EDIT = {skin:null, head:null, steve:false};
+let VIEWER = null;
+const tiersOf = id => Object.fromEntries(MODES.map(m => [m.id, tierIdx(((PL[id] || {}).tiers || {})[m.id])]));
+const codes = t => Object.fromEntries(MODES.map(m => [m.id, t[m.id]==null ? null : TIERS[t[m.id]]]));
+const totalOf = t => MODES.reduce((a, m) => a + pts(t[m.id]), 0);
+const bestOf = t => { const v = MODES.map(m => t[m.id]).filter(x => x!=null); return v.length ? Math.min(...v) : null; };
+const NAME_RE = /^[A-Za-z0-9_ ]{3,16}$/;
+
+async function listAll(col){ return (await getDocs(collection(db, col))).docs.map(d => Object.assign({id:d.id}, d.data())); }
+async function loadAll(){
+  const [us, ps, pr] = await Promise.all([listAll('users'), listAll('players'), listAll('private')]);
+  USERS = us.filter(u => u.ign).sort((a, b) => a.ign.localeCompare(b.ign));
+  PL = {}; ps.forEach(p => PL[p.id] = p);
+  PRIV = {}; pr.forEach(p => PRIV[p.id] = p);
+}
+
+/* ============================ DISCORD (optional) ============================ */
+const isHook = u => /^https:\/\/(canary\.|ptb\.)?discord(app)?\.com\/api\/webhooks\//.test(u);
+async function sendDiscord(embed){
+  const hooks = DISCORD_WEBHOOKS.filter(isHook);
+  if (!hooks.length) return 'off';
+  const body = JSON.stringify({username:'Tier Test', embeds:[embed], allowed_mentions:{parse:[]}});
+  const r = await Promise.all(hooks.map(u => fetch(u, {method:'POST', headers:{'Content-Type':'application/json'}, body}).then(x => x.ok).catch(() => false)));
+  return r.every(Boolean) ? 'ok' : r.some(Boolean) ? 'partial' : 'fail';
+}
+function rankEmbed(name, oldT, newT, isNew){
+  const lines = MODES.map(m => {
+    const a = oldT[m.id], b = newT[m.id], t = i => i==null ? 'Unranked' : TIERS[i];
+    return a === b ? `${m.icon} **${m.name}**: \`${t(b)}\`` : `${m.icon} **${m.name}**: \`${t(a)}\` → \`${t(b)}\``;
+  }).join('\n');
+  return {title: isNew ? '🆕 New player' : '📈 Rank updated', color:0xFFBF2F,
+    description: isNew ? `**${esc2(name)}** was added.` : `Ranks updated for **${esc2(name)}**.`,
+    fields:[{name:'Tiers', value:lines}], footer:{text:'Tier Test'}, timestamp:new Date().toISOString()};
+}
+
+/* ============================ SKINS ============================ */
+function makeHead(src){
+  const c = document.createElement('canvas'); c.width = c.height = 8;
+  const x = c.getContext('2d'); x.imageSmoothingEnabled = false;
+  x.drawImage(src, 8, 8, 8, 8, 0, 0, 8, 8); x.drawImage(src, 40, 8, 8, 8, 0, 0, 8, 8);
+  return c.toDataURL('image/png');
+}
+function readSkin(file){
+  return new Promise((res, rej) => {
+    if (file.type !== 'image/png') return rej(new Error('Skin must be a PNG file.'));
+    if (file.size > 100000) return rej(new Error('That file is too big to be a skin.'));
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      if (img.naturalWidth !== 64 || (img.naturalHeight !== 64 && img.naturalHeight !== 32))
+        return rej(new Error(`This image is ${img.naturalWidth}x${img.naturalHeight}. Skins must be exactly 64x64 pixels.`));
+      const c = document.createElement('canvas'); c.width = 64; c.height = img.naturalHeight;
+      c.getContext('2d').drawImage(img, 0, 0);
+      const skin = c.toDataURL('image/png');
+      if (skin.length > 45000) return rej(new Error('Skin file is too large after processing.'));
+      res({skin, head:makeHead(c)});
+    };
+    img.onerror = () => rej(new Error('Could not read that image.'));
+    img.src = url;
+  });
+}
+function mkViewer(canvas, skin){
+  if (!window.skinview3d || !canvas) return null;
+  try{
+    const v = new skinview3d.SkinViewer({canvas, width:canvas.width, height:canvas.height, skin});
+    v.animation = new skinview3d.IdleAnimation(); v.autoRotate = true; v.autoRotateSpeed = .6; v.zoom = .85;
+    if (v.controls){ v.controls.enableZoom = false; v.controls.enablePan = false; }
+    return v;
+  }catch(e){ return null; }
+}
+const killViewer = () => { if (VIEWER){ try{ VIEWER.dispose(); }catch(e){} VIEWER = null; } };
+
+/* ============================ CARDS ============================ */
+// Cards are drawn here (in the browser) from the templates in the Template- repo and saved to Firestore (cards/{id}).
+const TB = 'https://trollfragz.github.io/Template-/';
+const TPL = 'tpl/';               // folder (inside the Template- repo) that holds the template JSON files
+const SKIN_ANGLE = Math.PI / 4;   // turn of the 3D skin: positive = faces the right side, negative = left side
+const SKIN_ZOOM = 0.8;            // smaller number = skin looks smaller on the card
+const CFONT = "'Chakra Petch',Arial,sans-serif";
+const TCOL = {HT:'#e6b422', MT:'#4aa3ff', LT:'#cd7f32'};
+const TITLES = [[400,'Combat Master'],[270,'Combat Ace'],[160,'Combat Specialist'],[80,'Combat Cadet'],[25,'Combat Novice'],[1,'Rookie']];
+const titleOf = p => (TITLES.find(t => p >= t[0]) || [0, 'Unranked'])[1];
+const imgCache = {};
+const loadImg = u => imgCache[u] || (imgCache[u] = new Promise(r => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => r(i); i.onerror = () => r(null); i.src = u; }));
+const loadRaw = u => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = u; });
+const getJson = async u => { const r = await fetch(u + '?v=' + Date.now()); const nm = u.split('/').pop(); if (!r.ok) throw new Error('Could not load ' + nm); try{ return JSON.parse(await r.text()); }catch(e){ throw new Error('This file is not valid JSON: ' + nm); } };
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const setGen = t => { const g = $('#gen'); g.hidden = !t; g.textContent = t || ''; };
+$('#gen').onclick = () => setGen('');
+const setFont = (x, s) => { x.font = `600 ${s}px ${CFONT}`; };
+const modePts = (r, m) => m ? pts(r.t[m]) : r.total;
+function ranking(m){
+  const rows = USERS.map(u => { const t = tiersOf(u.id); return {id:u.id, ign:u.ign, t, total:totalOf(t)}; });
+  return rows.filter(r => modePts(r, m) > 0).sort((a, b) => modePts(b, m) - modePts(a, m) || (m ? b.total - a.total : 0) || a.ign.localeCompare(b.ign));
+}
+function flatSkin(img, w, h){
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d'); x.imageSmoothingEnabled = false;
+  const s = Math.min(w / 16, h / 32), ox = (w - 16 * s) / 2, oy = (h - 32 * s) / 2, old = img.naturalHeight === 32;
+  const d = (sx, sy, sw, sh, dx, dy) => x.drawImage(img, sx, sy, sw, sh, ox + dx * s, oy + dy * s, sw * s, sh * s);
+  d(4, 20, 4, 12, 4, 20); d(old ? 4 : 20, old ? 20 : 52, 4, 12, 8, 20);
+  d(44, 20, 4, 12, 0, 8); d(old ? 44 : 36, old ? 20 : 52, 4, 12, 12, 8);
+  d(20, 20, 8, 12, 4, 8); d(8, 8, 8, 8, 4, 0); d(40, 8, 8, 8, 4, 0);
+  return c;
+}
+async function skinPic(src, w, h){
+  try{
+    if (!window.skinview3d) throw 0;
+    const cv = document.createElement('canvas'); cv.width = w * 2; cv.height = h * 2;
+    const v = new skinview3d.SkinViewer({canvas:cv, width:w * 2, height:h * 2, preserveDrawingBuffer:true});
+    await v.loadSkin(src);
+    v.animation = null; v.zoom = SKIN_ZOOM; v.playerObject.rotation.y = SKIN_ANGLE;
+    v.render();
+    const o = document.createElement('canvas'); o.width = cv.width; o.height = cv.height;
+    o.getContext('2d').drawImage(cv, 0, 0);
+    try{ v.dispose(); }catch(e){}
+    return o;
+  }catch(e){
+    const img = await loadRaw(src);
+    return img ? flatSkin(img, w * 2, h * 2) : null;
+  }
+}
+async function drawCard(tpl, bgN, fill){
+  const c = document.createElement('canvas'); c.width = tpl.width; c.height = tpl.height;
+  const x = c.getContext('2d');
+  const bg = await loadImg(TB + tpl.backgrounds.folder + tpl.backgrounds.pattern.replace('{n}', bgN));
+  if (bg) x.drawImage(bg, 0, 0, c.width, c.height); else { x.fillStyle = '#262b33'; x.fillRect(0, 0, c.width, c.height); }
+  const ims = await Promise.all(tpl.items.map(i => i.t === 'image' ? loadImg(TB + tpl.overlayFolder + i.file) : null));
+  const pics = front => tpl.items.forEach((i, k) => { if (i.t === 'image' && !i.hide && !!i.front === front && ims[k]) x.drawImage(ims[k], i.x, i.y, i.w, i.h); });
+  pics(false);
+  for (const i of tpl.items) if (i.t !== 'image' && !i.hide) await fill(x, i);
+  pics(true);
+  return c;
+}
+async function fillProfile(x, i, d){
+  x.textBaseline = 'top';
+  if (i.t === 'text'){
+    const v = d.text[i.id]; if (!v) return;
+    setFont(x, i.s); x.fillStyle = i.c; x.fillText(v, i.x, i.y);
+  } else if (i.t === 'tier'){
+    const ti = d.t[i.id.slice(5)], code = ti == null ? '-' : TIERS[ti];
+    setFont(x, i.s); x.fillStyle = ti == null ? '#9aa0a6' : TCOL[code.slice(0, 2)];
+    x.fillText(code, i.x + (i.w - x.measureText(code).width) / 2, i.y + i.h + 4);
+  } else if (i.t === 'box' && i.id === 'skin'){
+    const p = await skinPic(d.skin, i.w, i.h); if (p) x.drawImage(p, i.x, i.y, i.w, i.h);
+  }
+}
+function fillBoard(x, i, top){
+  x.textBaseline = 'top';
+  if (i.t === 'label'){ setFont(x, i.s); x.fillStyle = i.c; x.fillText(i.text, i.x, i.y); }
+  else if (i.t === 'rows'){
+    for (let n = 0; n < 10; n++){
+      const y = i.y + n * i.h; x.fillStyle = n % 2 ? 'rgba(255,255,255,.08)' : 'rgba(255,255,255,.14)'; x.fillRect(i.x, y, i.w, i.h - 4);
+      const r = top[n]; if (!r) continue;
+      x.fillStyle = i.c; setFont(x, i.s);
+      const pt = r.p + ' pts', pw = x.measureText(pt).width, max = i.w - 110 - pw - 30;
+      let fs = i.s, nm = r.name; setFont(x, fs);
+      while (x.measureText(nm).width > max && fs > 12){ fs--; setFont(x, fs); }
+      x.fillText(nm, i.x + 110, y + (i.h - 4 - fs) / 2);
+      setFont(x, i.s); x.fillText('#' + (n + 1), i.x + 14, y + (i.h - 4 - i.s) / 2);
+      x.fillText(pt, i.x + i.w - pw - 14, y + (i.h - 4 - i.s) / 2);
+    }
+  }
+}
+function toJpeg(c){ let q = .9, u; do { u = c.toDataURL('image/jpeg', q); q -= .07; } while (u.length > 270000 && q > .5); return u; }
+const saveCard = (id, c, bg) => setDoc(doc(db, 'cards', id), {data:toJpeg(c), bg, updatedAt:Date.now()});
+async function buildCards({ids, boards}){
+  try{ await document.fonts.load('600 20px "Chakra Petch"'); }catch(e){}
+  const overall = ranking(null), list = (ids === 'all' ? USERS.map(u => u.id) : ids).filter(id => USERS.some(u => u.id === id));
+  let total = list.length + (boards ? 9 : 0), n = 0;
+  const step = () => setGen(`Making cards: ${++n} / ${total}`);
+  setGen('Loading templates...');
+  const ptpl = list.length ? await getJson(TB + TPL + 'profile-template.json') : null;
+  for (const id of list){
+    const u = USERS.find(x => x.id === id), t = tiersOf(id), tot = totalOf(t), pos = overall.findIndex(r => r.id === id) + 1;
+    let skin = STEVE_SKIN;
+    try{ const s = await getDoc(doc(db, 'skins', id)); if (s.exists() && s.data().data) skin = s.data().data; }catch(e){}
+    const text = {username:u.ign, rank:pos ? 'Rank #' + pos : 'Unranked', points:tot + ' points', title:titleOf(tot), region:u.region || ''};
+    const bgN = 1 + Math.floor(Math.random() * ptpl.backgrounds.count);
+    const c = await drawCard(ptpl, bgN, (x, i) => fillProfile(x, i, {text, t, skin}));
+    await saveCard(id, c, bgN); step(); await wait(30);
+  }
+  if (boards){
+    for (const m of [null, ...MODES.map(q => q.id)]){
+      const key = m || 'overall', tpl = await getJson(`${TB}${TPL}leaderboard-${key}.json`);
+      const top = ranking(m).slice(0, 10).map(r => ({name:r.ign, p:modePts(r, m)}));
+      const bgN = 1 + Math.floor(Math.random() * tpl.backgrounds.count);
+      const c = await drawCard(tpl, bgN, (x, i) => fillBoard(x, i, top));
+      await saveCard('lb-' + key, c, bgN); step(); await wait(30);
+    }
+  }
+  setGen('Done. ' + total + ' card(s) saved.'); setTimeout(() => setGen(''), 4000);
+}
+let cardQ = Promise.resolve();
+const queueCards = job => { cardQ = cardQ.then(job).catch(e => { console.error(e); setGen('Card error: ' + errMsg(e) + ' (tap to close)'); }); return cardQ; };
+
+/* ============================ SCREENS ============================ */
+function loginHTML(){
+  if (TESTER_KEY) return `<div class="card gate"><h2>Signing in…</h2><p class="muted" style="margin:0">${esc(loginErr) || 'One moment.'}</p></div>`;
+  return `<div class="card gate"><h1>Admin</h1><p class="muted" style="margin:0">Enter the tester key once. This device will stay signed in.</p>
+    <form id="login-form" style="display:grid;gap:10px" novalidate>
+      <input class="field" id="lk" type="password" autocomplete="current-password" placeholder="Tester key">
+      <div class="err" id="lerr" role="alert">${esc(loginErr)}</div>
+      <button class="btn primary" type="submit">Open</button>
+    </form></div>`;
+}
+function homeHTML(){
+  return `<div class="ph"><h1>What do you want to do?</h1></div>
+    <div class="tiles">
+      <button class="tile" data-act="go-create"><b>➕ Create user</b><span>Add a new player with username, skin, links and tiers.</span></button>
+      <button class="tile" data-act="gen-all"><b>Generate all cards</b><span>Rebuild every profile card and the 9 leaderboard cards.</span></button>
+      <button class="tile" data-act="go-players"><b>👥 Players</b><span>Search a player and edit anything: tiers, skin, links, description.</span></button>
+    </div>
+    <p class="muted" style="margin-top:22px">${USERS.length} player${USERS.length === 1 ? '' : 's'} in the database.</p>`;
+}
+let PQ = '';
+function playersHTML(){
+  return `<div class="ph"><h1>Players</h1><button class="btn primary sm" data-act="go-create" style="margin-left:auto">➕ Create user</button></div>
+    <input class="field" id="pq" type="search" autocomplete="off" placeholder="Search a player name (even one letter)…" value="${esc(PQ)}" style="margin-bottom:14px">
+    <div id="plist">${playersListHTML()}</div>`;
+}
+function playersListHTML(){
+  const q = PQ.trim().toLowerCase();
+  const list = USERS.filter(u => u.ign.toLowerCase().includes(q)).slice(0, 80);
+  if (!list.length) return `<div class="card muted">${USERS.length ? 'No player with this name.' : 'No players yet. Press Create user.'}</div>`;
+  return list.map(u => {
+    const t = tiersOf(u.id);
+    return `<button class="prow" data-act="edit" data-id="${esc(u.id)}">${avatar(u.headData, 40)}<span class="nm"><b>${esc(u.ign)}</b><span class="muted">${esc(u.region || 'no region')} · ${totalOf(t)} points</span></span>${badge(bestOf(t), 36)}</button>`;
+  }).join('');
+}
+const tierOpts = sel => '<option value="">Unranked</option>' + TIERS.map((t, i) => `<option value="${i}" ${sel === i ? 'selected' : ''}>${t}</option>`).join('');
+function editorHTML(){
+  const u = editId ? USERS.find(x => x.id === editId) : null, pr = (editId && PRIV[editId]) || {}, t = editId ? tiersOf(editId) : {};
+  return `<div class="ph"><h1>${u ? 'Edit ' + esc(u.ign) : 'Create user'}</h1></div>
+    <form id="pform" class="ed" novalidate>
+      <div class="card skin"><b>Skin</b>
+        <canvas id="sk" width="170" height="230" aria-label="3D skin preview"></canvas>
+        <small class="muted" id="sknote">Loading…</small>
+        <label class="btn sm" style="cursor:pointer">Upload skin (64x64 PNG)<input type="file" id="skfile" accept="image/png" hidden></label>
+        <button type="button" class="btn sm" data-act="steve">Use default Steve skin</button>
+        <div class="err" id="skerr" role="alert"></div></div>
+      <div class="card fields">
+        <div class="f2">
+          <div><label class="l" for="f-ign">Username</label><input class="field" id="f-ign" maxlength="16" autocomplete="off" value="${esc(u ? u.ign : '')}" placeholder="3 to 16 letters, numbers, _ or space"></div>
+          <div><label class="l" for="f-region">Region</label><select class="field" id="f-region"><option value="">Not set</option>${REGIONS.map(r => `<option ${u && u.region === r ? 'selected' : ''}>${r}</option>`).join('')}</select></div>
+        </div>
+        <div class="f2">
+          <div><label class="l" for="f-dc">Discord username <span class="muted">(only you see it)</span></label><input class="field" id="f-dc" maxlength="40" autocomplete="off" value="${esc(pr.discord || '')}"></div>
+          <div><label class="l" for="f-dl">Discord link <span class="muted">(public)</span></label><input class="field" id="f-dl" maxlength="200" value="${esc(u ? u.discordLink || '' : '')}" placeholder="https://discord.gg/…"></div>
+        </div>
+        <div><label class="l" for="f-yt">YouTube link <span class="muted">(public)</span></label><input class="field" id="f-yt" maxlength="200" value="${esc(u ? u.youtube || '' : '')}" placeholder="https://youtube.com/@…"></div>
+        <div><label class="l" for="f-desc">Description <span class="muted">(public)</span></label><textarea id="f-desc" maxlength="300">${esc(u ? u.description || '' : '')}</textarea></div>
+        <div><label class="l">Tiers</label><div class="tg">${MODES.map(m => `<div class="mp"><span>${m.icon} ${m.name}</span><select data-mode="${m.id}" aria-label="${m.name} tier">${tierOpts(t[m.id] == null ? null : t[m.id])}</select></div>`).join('')}</div>
+          <div class="hint">The overall rank is worked out from the tiers automatically.</div></div>
+        <div class="err" id="perr" role="alert"></div>
+        <div class="acts"><button class="btn primary" type="submit">${u ? 'Save changes' : 'Create user'}</button>
+          <button type="button" class="btn" data-act="go-players">Cancel</button>
+          ${u ? '<button type="button" class="btn danger" data-act="del">Delete player</button>' : ''}</div>
+      </div>
+    </form>`;
+}
+
+/* ============================ RENDER ============================ */
+const app = $('#app');
+function render(){
+  killViewer();
+  $('#out').hidden = !user || !!TESTER_KEY;
+  if (!authReady) app.innerHTML = '<div class="card gate"><h2>Loading…</h2></div>';
+  else if (!user) app.innerHTML = loginHTML();
+  else if (!isTester) app.innerHTML = `<div class="card gate"><h2>This account is not a tester</h2><p class="muted" style="margin:0">In Firebase, open Firestore and create the collection <b>roles</b> with the Document ID <b>${esc(user.uid)}</b> and any field (for example role = tester). Then refresh this page.</p></div>`;
+  else if (screen === 'players') app.innerHTML = playersHTML();
+  else if (screen === 'edit') { app.innerHTML = editorHTML(); mountSkin(); }
+  else app.innerHTML = homeHTML();
+  window.scrollTo(0, 0);
+}
+async function mountSkin(){
+  const id = editId, c = $('#sk'), note = $('#sknote');
+  let skin = EDIT.skin, label = 'Preview of the new skin';
+  if (!skin && EDIT.steve){ skin = STEVE_SKIN; label = 'Default Steve skin'; }
+  if (!skin && id){ try{ const s = await getDoc(doc(db, 'skins', id)); if (s.exists() && s.data().data) { skin = s.data().data; label = 'Current skin'; } }catch(e){} }
+  if (!skin){ skin = STEVE_SKIN; label = 'Default Steve skin'; }
+  if (screen !== 'edit' || id !== editId || !$('#sk')) return;
+  killViewer(); VIEWER = mkViewer(c, skin);
+  note.textContent = VIEWER ? label + ' · drag to rotate' : label;
+}
+function go(s){ screen = s; render(); }
+async function refreshAndGo(s){ await guard(loadAll); go(s); }
+
+/* ============================ AUTH ============================ */
+const fakeEmail = () => TESTER_USERNAME.toLowerCase() + '@hive-tier.local';
+onAuthStateChanged(auth, async u => {
+  user = u; isTester = false;
+  if (!u && TESTER_KEY && !autoTried){
+    autoTried = true;
+    try{ await signInWithEmailAndPassword(auth, fakeEmail(), TESTER_KEY); return; }
+    catch(e){ loginErr = errMsg(e) + ' Check TESTER_USERNAME and TESTER_KEY in this file.'; }
+  }
+  if (u){
+    await guard(async () => {
+      const r = await getDoc(doc(db, 'roles', u.uid)); isTester = r.exists();
+      if (isTester) await loadAll();
+    });
+  }
+  authReady = true; render();
+});
+$('#out').addEventListener('click', () => guard(() => signOut(auth)));
+$('#brand').addEventListener('click', () => { if (isTester) go('home'); });
+
+/* ============================ ACTIONS ============================ */
+async function savePlayer(){
+  const err = m => { $('#perr').textContent = m; }; err('');
+  const ign = $('#f-ign').value.trim().replace(/\s+/g, ' ');
+  if (!NAME_RE.test(ign)) return err(/^[A-Za-z0-9_ ]*$/.test(ign) ? 'The username must be 3 to 16 characters long.' : 'Use only English letters, numbers, underscores and spaces in the username.');
+  const yt = $('#f-yt').value.trim(), dl = $('#f-dl').value.trim();
+  if (yt && !/^https:\/\//i.test(yt)) return err('The YouTube link must start with https://');
+  if (dl && !/^https:\/\//i.test(dl)) return err('The Discord link must start with https://');
+  const existing = editId ? USERS.find(x => x.id === editId) : null, id = editId || newId(), lower = ign.toLowerCase();
+  const nm = await getDoc(doc(db, 'names', lower));
+  if (nm.exists() && nm.data().uid !== id) return err('Another player already has this username.');
+  const newT = {}; $$('select[data-mode]').forEach(s => { newT[s.dataset.mode] = s.value === '' ? null : Number(s.value); });
+  const oldT = editId ? tiersOf(editId) : Object.fromEntries(MODES.map(m => [m.id, null]));
+  const oldPl = PL[id] || {}, hist = [...(oldPl.history || [])];
+  MODES.forEach(m => { if (newT[m.id] != null && newT[m.id] !== oldT[m.id]) hist.push({mode:m.id, tier:TIERS[newT[m.id]], date:Date.now()}); });
+  const skinChanged = !!EDIT.skin || (!editId) || EDIT.steve;
+  const skin = EDIT.skin || STEVE_SKIN, head = EDIT.skin ? EDIT.head : (skinChanged ? STEVE_HEAD : (existing && existing.headData) || STEVE_HEAD);
+  const b = writeBatch(db);
+  const user_ = {ign, region:$('#f-region').value, youtube:yt, discordLink:dl, description:$('#f-desc').value.trim().slice(0, 300), headData:head, createdAt:(existing && existing.createdAt) || Date.now()};
+  b.set(doc(db, 'users', id), user_);
+  b.set(doc(db, 'private', id), {discord:$('#f-dc').value.trim().slice(0, 40), serverLink:(PRIV[id] && PRIV[id].serverLink) || ''});
+  b.set(doc(db, 'players', id), {tiers:Object.assign({}, oldPl.tiers || {}, codes(newT)), history:hist, updatedBy:user.uid, updatedAt:Date.now()});
+  if (skinChanged) b.set(doc(db, 'skins', id), {data:skin, updatedAt:serverTimestamp()});
+  if (!nm.exists()) b.set(doc(db, 'names', lower), {uid:id});
+  if (existing && existing.ign.toLowerCase() !== lower) b.delete(doc(db, 'names', existing.ign.toLowerCase()));
+  await b.commit();
+  await loadAll();
+  const changed = MODES.some(m => newT[m.id] !== oldT[m.id]);
+  queueCards(() => buildCards({ids:[id], boards: changed || !existing || existing.ign !== ign}));
+  let msg = existing ? 'Saved.' : 'Player created.';
+  if (changed){
+    const d = await sendDiscord(rankEmbed(ign, oldT, newT, !existing));
+    if (d === 'fail') msg += ' The Discord message failed.'; else if (d === 'ok' || d === 'partial') msg += ' Discord was told.';
+  }
+  EDIT = {skin:null, head:null, steve:false}; editId = null; toast(msg); go('players');
+}
+async function deletePlayer(){
+  const u = USERS.find(x => x.id === editId); if (!u) return;
+  const b = writeBatch(db);
+  ['users', 'players', 'skins', 'private', 'cards'].forEach(c => b.delete(doc(db, c, u.id)));
+  b.delete(doc(db, 'names', u.ign.toLowerCase()));
+  await b.commit(); await loadAll();
+  queueCards(() => buildCards({ids:[], boards:true}));
+  closeDlg(); editId = null; toast(u.ign + ' was deleted.'); go('players');
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const a = el.dataset.act, v = el.dataset.v, id = el.dataset.id;
+  switch (a){
+    case 'go-players': EDIT = {skin:null, head:null, steve:false}; editId = null; PQ = ''; go('players'); break;
+    case 'go-create': editId = null; EDIT = {skin:null, head:null, steve:false}; go('edit'); break;
+    case 'edit': editId = id; EDIT = {skin:null, head:null, steve:false}; go('edit'); break;
+    case 'steve': EDIT = {skin:null, head:null, steve:true}; mountSkin(); break;
+    case 'del': openDlg(`<h2>Delete ${esc((USERS.find(x => x.id === editId) || {}).ign || 'player')}?</h2><p class="muted">This removes the player, their tiers and skin for good.</p><div class="acts"><button class="btn danger" data-act="del-yes">Delete</button><button class="btn" data-act="dlg-close">Cancel</button></div>`); break;
+    case 'del-yes': guard(deletePlayer); break;
+    case 'dlg-close': closeDlg(); break;
+    case 'gen-all': queueCards(() => buildCards({ids:'all', boards:true})); break;
+  }
+});
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.id === 'pq'){ PQ = t.value; $('#plist').innerHTML = playersListHTML(); return; }
+
+});
+document.addEventListener('change', async e => {
+  const t = e.target;
+  if (t.id === 'skfile' && t.files[0]){
+    $('#skerr').textContent = '';
+    try{ const r = await readSkin(t.files[0]); EDIT = {skin:r.skin, head:r.head, steve:false}; mountSkin(); }
+    catch(err){ $('#skerr').textContent = err.message; }
+    t.value = '';
+  }
+});
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  if (e.target.id === 'login-form') guard(async () => {
+    const k = $('#lk').value; if (!k){ $('#lerr').textContent = 'Enter the tester key.'; return; }
+    try{ await signInWithEmailAndPassword(auth, fakeEmail(), k); }
+    catch(err){ $('#lerr').textContent = errMsg(err); }
+  });
+  else if (e.target.id === 'pform') guard(async () => { const btn = $('#pform button[type=submit]'); btn.disabled = true; try{ await savePlayer(); } finally { btn.disabled = false; } });
+});
+if (window.__ADMIN_TEST__) window.__ADMIN_TEST__.setSkin = (skin, head) => { EDIT = {skin, head, steve:false}; };   // used only by the automatic tests
+render();
+</script>
+</body>
+</html>
